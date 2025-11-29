@@ -54,7 +54,7 @@
 .page-btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
-  color: var(--border-color);
+  color: var(--icon-disabled);
 }
 
 .page-btn:not(.page-btn:nth-of-type(1), .page-btn:last-child,.page-btn.active) {

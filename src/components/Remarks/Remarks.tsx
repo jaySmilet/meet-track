@@ -33,7 +33,7 @@ class Remarks extends Component<{}, State> {
     this.adjustTextareaHeight();
   }
 
-  componentDidUpdate(prevProps: {}, prevState: State) {
+  componentDidUpdate(_prevProps: {}, prevState: State) {
     if (prevState.remarks !== this.state.remarks) {
       this.adjustTextareaHeight();
     }
