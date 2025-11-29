@@ -2,6 +2,8 @@ import React from "react";
 import { headerData, meetTrackList } from "../../static-data";
 import CustomDatePicker from "../CustomDatePicker/CustomDatePicker";
 import { Status } from "../../models";
+import CustomPagination from "../CustomPagination/CustomPagination";
+import { useNavigate } from "react-router-dom";
 
 const normalizeMeetList = meetTrackList.map((item) => ({
   ...item,
@@ -10,6 +12,20 @@ const normalizeMeetList = meetTrackList.map((item) => ({
 
 const MeetTable = () => {
   const [fakeMeetList, setFakeMeetList] = React.useState(normalizeMeetList);
+  const navigate = useNavigate();
+  // Pagination states
+  const [currentPage, setCurrentPage] = React.useState(1);
+  const [pageSize, setPageSize] = React.useState(10);
+  const totalItems = fakeMeetList.length;
+  const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
+  const safePage = Math.min(currentPage, totalPages);
+  const startIndex = (safePage - 1) * pageSize;
+  const currentRows = fakeMeetList.slice(startIndex, startIndex + pageSize);
+
+  const handlePageSizeChange = (size: number) => {
+    setPageSize(size);
+    setCurrentPage(1);
+  };
 
   const handleDateChange = (id: number, date: Date | null) => {
     setFakeMeetList((prev) =>
@@ -21,28 +37,28 @@ const MeetTable = () => {
 
   const getStatusClass = (status: string) => {
     switch (status) {
-      case "Approved":
-        return "text-success";
-      case "Declined":
-        return "text-danger";
+      case Status.APPROVED:
+        return "status-success";
+      case Status.DECLINED:
+        return "status-danger";
       default:
         return "";
     }
   };
   return (
-    <div>
-      <table className="table border-gray-1">
+    <div className="w-100 h-100 d-flex flex-column justify-content-around p-2">
+      <table className="table meet-table">
         <thead>
           <tr>
             {headerData.map((headerItem: string) => (
-              <th scope="col" className="fw-semibold">
+              <th scope="col" className="text-color fw-semibold">
                 {headerItem}
               </th>
             ))}
           </tr>
         </thead>
         <tbody>
-          {fakeMeetList.map((meet) => (
+          {currentRows.map((meet) => (
             <React.Fragment>
               <tr key={meet.id}>
                 <td>{meet.customer_name}</td>
@@ -71,17 +87,22 @@ const MeetTable = () => {
                   <div className="d-flex align-items-center justify-content-end gap-2">
                     {meet.status === "Approved" ? null : (
                       <>
-                        <i className="bi bi-check-circle text-success cursor-pointer"></i>
+                        <i className="bi bi-check-circle status-success cursor-pointer"></i>
                         <i
-                          className={`bi bi-x-circle cursor-pointer ${
-                            meet.status === Status.DECLINED ? "" : "text-danger"
+                          className={`bi bi-x-circle ${
+                            meet.status === Status.DECLINED
+                              ? "icon-disabled cursor-disabled"
+                              : "status-danger cursor-pointer"
                           }`}
                         ></i>
                       </>
                     )}
 
-                    <i className="bi bi-pencil-square cursor-pointer"></i>
-                    <i className="bi bi-trash3 cursor-pointer"></i>
+                    <i
+                      className="bi bi-pencil-square cursor-pointer text-gray"
+                      onClick={() => navigate("/remarks")}
+                    ></i>
+                    <i className="bi bi-trash3 cursor-pointer icon-gray"></i>
                   </div>
                 </td>
               </tr>
@@ -89,6 +110,14 @@ const MeetTable = () => {
           ))}
         </tbody>
       </table>
+
+      <CustomPagination
+        totalItems={totalItems}
+        pageSize={pageSize}
+        currentPage={safePage}
+        onPageChange={setCurrentPage}
+        onPageSizeChange={handlePageSizeChange}
+      />
     </div>
   );
 };

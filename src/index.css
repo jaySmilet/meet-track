@@ -1,5 +1,53 @@
 @import "bootstrap-icons/font/bootstrap-icons.css";
 
+#root{
+  width: 100%;
+  height: 100vh;
+}
+
 body{
   padding: 8px;
+}
+
+:root{
+  --text-white: #FFFFFF;
+  --text-color: #000000;
+  --border-color: #C7D2DD;
+  --danger-color: #FF433E;
+  --success-color: #008001;
+  --icon-gray: #14142C;
+  --icon-disbled: #7B7B7B;
+  --text-purple-light: #F6F4FE;
+  --text-purple-medium: #E1DAFC;
+  --text-purple-dark: #7541D6;
+  --text-purple-border: #6D3BD9;
+  --table-header-bg: #EDF0F8;
+}
+
+.status-danger {
+  color: var(--danger-color);
+}
+
+.status-success{
+  color: var(--success-color);
+}
+
+.icon-gray {
+  color: var(--icon-gray);
+}
+
+.icon-disabled {
+  color: var(--icon-disbled);
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+.cursor-disabled {
+  cursor: not-allowed;
+}
+
+.text-color {
+  color: var(--text-color) !important;
 }

@@ -1,0 +1,19 @@
+p{
+    font-size: 14px;
+}
+p.counter {
+    color: var(--border-color);
+}
+textarea {
+    border-color: var(--border-color);
+}
+
+textarea:focus {
+    border-color: var(--border-color);
+    box-shadow: none;
+    outline: none;
+}
+
+textarea::placeholder {
+    font-size: 14px;
+}

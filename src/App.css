@@ -1,19 +1,25 @@
-.border-gray-1 {
-  border: 1px solid gray;
+.table.meet-table {
+  --bs-table-border-color: var(--border-color);
+  border: 1px solid var(--border-color);
 }
-.border-gray-left-1 {
-  border-left: 1px solid gray;
+.meet-table thead th{
+  --bs-table-bg: var(--table-header-bg);
+  border-bottom: none;
 }
 
-tr th:last-child, tr td:last-child {
-  border-left: 1px solid gray;
+.meet-table th, td{
+  vertical-align: middle;
+}
+
+.meet-table tr th:last-child, .meet-table tr td:last-child {
+  border-left: 1px solid var(--border-color);
   text-align: end;
 }
 
-.table  tr th, .table tr td {
-  font-size: 13px !important;
+tr td:nth-last-child(2) {
+   border-right: 1px solid var(--border-color);
 }
 
-.cursor-pointer {
-  cursor: pointer;
+.table  tr th, .table tr td {
+  font-size: 13px;
 }
