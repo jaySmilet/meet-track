@@ -1,41 +1,52 @@
-import React from "react";
+import { Component } from "react";
 import { headerData, meetTrackList } from "../../static-data";
 import CustomDatePicker from "../CustomDatePicker/CustomDatePicker";
 import { Status } from "../../models";
 import CustomPagination from "../CustomPagination/CustomPagination";
-import { useNavigate } from "react-router-dom";
+import { type NavigateFunction, useNavigate } from "react-router-dom";
 
+// Normalizing meet list
 const normalizeMeetList = meetTrackList.map((item) => ({
   ...item,
   meeting_date: item.meeting_date ? new Date(item.meeting_date) : null,
 }));
 
-const MeetTable = () => {
-  const [fakeMeetList, setFakeMeetList] = React.useState(normalizeMeetList);
-  const navigate = useNavigate();
-  // Pagination states
-  const [currentPage, setCurrentPage] = React.useState(1);
-  const [pageSize, setPageSize] = React.useState(10);
-  const totalItems = fakeMeetList.length;
-  const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
-  const safePage = Math.min(currentPage, totalPages);
-  const startIndex = (safePage - 1) * pageSize;
-  const currentRows = fakeMeetList.slice(startIndex, startIndex + pageSize);
+interface Props {
+  navigate: NavigateFunction;
+}
 
-  const handlePageSizeChange = (size: number) => {
-    setPageSize(size);
-    setCurrentPage(1);
+interface State {
+  fakeMeetList: typeof normalizeMeetList;
+  currentPage: number;
+  pageSize: number;
+}
+
+class MeetTable extends Component<Props, State> {
+  constructor(props: Props) {
+    super(props);
+    this.state = {
+      fakeMeetList: normalizeMeetList,
+      currentPage: 1,
+      pageSize: 10,
+    };
+  }
+
+  handlePageSizeChange = (size: number) => {
+    this.setState({
+      pageSize: size,
+      currentPage: 1,
+    });
   };
 
-  const handleDateChange = (id: number, date: Date | null) => {
-    setFakeMeetList((prev) =>
-      prev.map((meet) =>
+  handleDateChange = (id: number, date: Date | null) => {
+    this.setState((prevState) => ({
+      fakeMeetList: prevState.fakeMeetList.map((meet) =>
         meet.id === id ? { ...meet, meeting_date: date } : meet
-      )
-    );
+      ),
+    }));
   };
 
-  const getStatusClass = (status: string) => {
+  getStatusClass = (status: string) => {
     switch (status) {
       case Status.APPROVED:
         return "status-success";
@@ -45,21 +56,31 @@ const MeetTable = () => {
         return "";
     }
   };
-  return (
-    <div className="w-100 h-100 d-flex flex-column justify-content-around p-2">
-      <table className="table meet-table">
-        <thead>
-          <tr>
-            {headerData.map((headerItem: string) => (
-              <th scope="col" className="text-color fw-semibold">
-                {headerItem}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {currentRows.map((meet) => (
-            <React.Fragment>
+
+  render() {
+    const { fakeMeetList, currentPage, pageSize } = this.state;
+    const { navigate } = this.props;
+
+    const totalItems = fakeMeetList.length;
+    const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
+    const safePage = Math.min(currentPage, totalPages);
+    const startIndex = (safePage - 1) * pageSize;
+    const currentRows = fakeMeetList.slice(startIndex, startIndex + pageSize);
+
+    return (
+      <div className="w-100 h-100 d-flex flex-column justify-content-around p-2">
+        <table className="table meet-table">
+          <thead>
+            <tr>
+              {headerData.map((headerItem: string, index) => (
+                <th key={index} scope="col" className="text-color fw-semibold">
+                  {headerItem}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {currentRows.map((meet) => (
               <tr key={meet.id}>
                 <td>{meet.customer_name}</td>
                 <td>{meet.contact_name}</td>
@@ -71,7 +92,7 @@ const MeetTable = () => {
                 <td>{meet.objective}</td>
                 <td>{meet.remarks}</td>
                 <td>
-                  <span className={getStatusClass(meet.status)}>
+                  <span className={this.getStatusClass(meet.status)}>
                     {meet.status}
                   </span>
                 </td>
@@ -79,7 +100,7 @@ const MeetTable = () => {
                   {meet.meeting_date && (
                     <CustomDatePicker
                       value={meet.meeting_date}
-                      onChange={(date) => handleDateChange(meet.id, date)}
+                      onChange={(date) => this.handleDateChange(meet.id, date)}
                     />
                   )}
                 </td>
@@ -97,7 +118,6 @@ const MeetTable = () => {
                         ></i>
                       </>
                     )}
-
                     <i
                       className="bi bi-pencil-square cursor-pointer text-gray"
                       onClick={() => navigate("/remarks")}
@@ -106,20 +126,23 @@ const MeetTable = () => {
                   </div>
                 </td>
               </tr>
-            </React.Fragment>
-          ))}
-        </tbody>
-      </table>
+            ))}
+          </tbody>
+        </table>
 
-      <CustomPagination
-        totalItems={totalItems}
-        pageSize={pageSize}
-        currentPage={safePage}
-        onPageChange={setCurrentPage}
-        onPageSizeChange={handlePageSizeChange}
-      />
-    </div>
-  );
-};
+        <CustomPagination
+          totalItems={totalItems}
+          pageSize={pageSize}
+          currentPage={safePage}
+          onPageChange={(page) => this.setState({ currentPage: page })}
+          onPageSizeChange={this.handlePageSizeChange}
+        />
+      </div>
+    );
+  }
+}
 
-export default MeetTable;
+export default function MeetTableWithNavigate() {
+  const navigate = useNavigate();
+  return <MeetTable navigate={navigate} />;
+}
